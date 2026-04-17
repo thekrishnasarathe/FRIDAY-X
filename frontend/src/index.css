@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --primary: #00d4ff;
+  --primary-dim: rgba(0, 212, 255, 0.15);
+  --primary-mid: rgba(0, 212, 255, 0.35);
+  --secondary: #0088ff;
+  --accent: #00ff88;
+  --accent-dim: rgba(0, 255, 136, 0.15);
+  --warning: #ff4d4d;
+  --warning-dim: rgba(255, 77, 77, 0.15);
+  --orange: #ff8800;
+  --orange-dim: rgba(255, 136, 0, 0.15);
+
+  --bg-deep: #030508;
+  --bg-panel: rgba(8, 12, 22, 0.88);
+  --bg-input: rgba(12, 18, 32, 0.9);
+  --bg-hover: rgba(0, 212, 255, 0.06);
+
+  --text-main: #e0f0ff;
+  --text-dim: #6ea8d4;
+  --text-muted: rgba(255, 255, 255, 0.35);
+
+  --font-hud: 'Orbitron', monospace;
+  --font-main: 'Inter', sans-serif;
+
+  --radius: 10px;
+  --glass-border: 1px solid rgba(0, 212, 255, 0.12);
+  --glow-sm: 0 0 8px rgba(0, 212, 255, 0.25);
+  --glow-md: 0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(0, 100, 200, 0.06) 0%, transparent 60%),
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 50px 50px, 50px 50px;
+  color: var(--text-main);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#root { width: 100vw; height: 100vh; }
+
+/* ─── Utility classes ─────────────────────────────────── */
+.glass {
+  background: var(--bg-panel);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.hud-label {
+  font-family: var(--font-hud);
+  font-size: 0.7rem;
+  letter-spacing: 2.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.glow { color: var(--primary); text-shadow: 0 0 10px var(--primary-dim); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--primary-dim); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }

@@ -1,0 +1,133 @@
+.auth-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 5, 10, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-panel {
+  width: 400px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  animation: pulse-border 4s infinite alternate;
+}
+
+@keyframes pulse-border {
+  0% { box-shadow: 0 0 10px rgba(0, 210, 255, 0.2); }
+  100% { box-shadow: 0 0 30px rgba(0, 210, 255, 0.4); }
+}
+
+.auth-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.arc-reactor-locked {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 4px solid var(--warning-glow);
+  box-shadow: 0 0 20px var(--warning-dim), inset 0 0 20px var(--warning-dim);
+  position: relative;
+  animation: slow-spin 10s linear infinite;
+}
+
+.arc-reactor-locked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: var(--warning-glow);
+  border-radius: 50%;
+  box-shadow: 0 0 30px var(--warning-glow);
+  opacity: 0.5;
+}
+
+@keyframes slow-spin {
+  100% { transform: rotate(360deg); }
+}
+
+.auth-header h2 {
+  color: var(--warning-glow);
+  text-shadow: 0 0 10px var(--warning-dim);
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.auth-header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.glow-input {
+  background: var(--bg-input);
+  border: 1px solid var(--primary-dim);
+  padding: 15px;
+  border-radius: 8px;
+  color: white;
+  font-family: var(--font-hud);
+  font-size: 1rem;
+  text-align: center;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.glow-input:focus {
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 15px var(--primary-dim);
+}
+
+.auth-error {
+  color: var(--warning-glow);
+  font-size: 0.85rem;
+  text-align: center;
+  text-shadow: 0 0 5px var(--warning-dim);
+}
+
+.glow-btn {
+  background: transparent;
+  border: 1px solid var(--primary-glow);
+  color: var(--primary-glow);
+  padding: 15px;
+  border-radius: 8px;
+  font-family: var(--font-hud);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.glow-btn:hover {
+  background: var(--primary-dim);
+  box-shadow: 0 0 20px var(--primary-dim);
+}
+
+.glow-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
