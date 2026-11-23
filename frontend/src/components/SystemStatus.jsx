@@ -1,64 +1,148 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
+import './SystemStatus.css';
 
 export default function SystemStatus() {
-  const [stats, setStats] = useState({ cpu: 0, ram: 0, battery: 100, plugged: true });
+  const [telemetry, setTelemetry] = useState({
+    cpu: 38,
+    ram: 47,
+    latency: 14,
+    sparklines: {
+      cpu: [32, 36, 42, 38, 44, 39, 36, 38],
+      ram: [45, 46, 47, 48, 47, 47, 46, 47],
+      latency: [12, 14, 13, 16, 14, 15, 13, 14],
+    },
+    status: 'online',
+  });
 
-  const fetch_ = async () => {
+  const fetchMetrics = async () => {
     try {
-      const r = await api.fetchSystemStats();
-      if (r) {
-        const m = [...r.matchAll(/(\d+\.?\d*)%/g)].map(x => parseFloat(x[1]));
-        if (m.length >= 3) setStats({ cpu: m[0], ram: m[1], battery: m[2], plugged: r.includes("plugged") });
+      const data = await api.fetchTelemetry();
+      if (data && data.cpu !== undefined) {
+        setTelemetry(data);
       }
     } catch {}
   };
 
   useEffect(() => {
-    fetch_();
-    let i = setInterval(() => { if (!document.hidden) fetch_(); }, 60000);
-    
-    const handleVisibilityChange = () => {
+    fetchMetrics();
+    let timer = setInterval(() => {
+      if (!document.hidden) fetchMetrics();
+    }, 15000);
+
+    const onVis = () => {
       if (!document.hidden) {
-        fetch_();
-        clearInterval(i);
-        i = setInterval(() => { if (!document.hidden) fetch_(); }, 60000);
+        fetchMetrics();
       }
     };
-    
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', onVis);
     return () => {
-      clearInterval(i);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVis);
     };
   }, []);
 
-  const Ring = ({ pct, color, label, icon }) => {
-    const r = 32, c = 2 * Math.PI * r, off = c - (pct / 100) * c;
+  // Gauge component with smooth SVG circle and no-clipping label
+  const RadialGauge = ({ value, max = 100, unit = '%', label, color = 'var(--cyan)', sparkline = [] }) => {
+    const radius = 26;
+    const circumference = 2 * Math.PI * radius;
+    const clampedVal = Math.min(max, Math.max(0, value));
+    const offset = circumference - (clampedVal / max) * circumference;
+
+    // Build SVG sparkline polyline points
+    const sparkW = 68;
+    const sparkH = 18;
+    const pts = sparkline.map((pt, idx) => {
+      const x = (idx / (sparkline.length - 1 || 1)) * sparkW;
+      const y = sparkH - ((pt % 50) / 50) * (sparkH - 4) - 2;
+      return `${x},${y}`;
+    }).join(' ');
+
     return (
-      <div className="ring-module">
-        <svg width="80" height="80" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="5"/>
-          <circle cx="40" cy="40" r={r} fill="none" stroke={color} strokeWidth="5"
-            strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round"
-            transform="rotate(-90 40 40)" style={{transition:'stroke-dashoffset 1.2s ease'}}/>
-        </svg>
-        <div className="ring-center" style={{color}}>{icon}</div>
-        <div className="ring-label">
-          <span className="ring-value" style={{color}}>{pct}%</span>
-          <span className="ring-name">{label}</span>
+      <div className="gauge-column">
+        <div className="gauge-circle-wrap">
+          <svg className="gauge-svg" width="66" height="66" viewBox="0 0 66 66">
+            <circle
+              className="gauge-bg"
+              cx="33"
+              cy="33"
+              r={radius}
+              fill="none"
+              stroke="rgba(0, 240, 255, 0.08)"
+              strokeWidth="4"
+            />
+            <circle
+              className="gauge-progress"
+              cx="33"
+              cy="33"
+              r={radius}
+              fill="none"
+              stroke={color}
+              strokeWidth="4"
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              transform="rotate(-90 33 33)"
+              style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+            />
+          </svg>
+
+          <div className="gauge-inner-val">
+            <span className="gauge-number" style={{ color }}>{value}</span>
+            <span className="gauge-unit">{unit}</span>
+          </div>
+        </div>
+
+        <span className="gauge-label">{label}</span>
+
+        {/* Mini ECG Sparkline Waveform */}
+        <div className="gauge-sparkline-box">
+          <svg width={sparkW} height={sparkH} className="sparkline-svg">
+            <polyline
+              fill="none"
+              stroke={color}
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              points={pts || `0,9 10,6 20,12 30,5 40,11 50,7 68,9`}
+              opacity="0.85"
+            />
+          </svg>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="sys-status glass">
-      <span className="hud-label">System Diagnostics</span>
-      <div className="rings-row">
-        <Ring pct={stats.cpu} color="var(--primary)" label="CPU" icon="⚙" />
-        <Ring pct={stats.ram} color={stats.ram > 85 ? "var(--warning)" : "var(--accent)"} label="RAM" icon="◈" />
-        <Ring pct={stats.battery} color={stats.battery < 20 ? "var(--warning)" : "var(--primary)"} label={stats.plugged ? "⚡Charge" : "Battery"} icon="⏻" />
+    <div className="telemetry-card tactical-panel tactical-corner">
+      <div className="telemetry-card-header">
+        <span className="hud-title">SYSTEM TELEMETRY</span>
+        <span className="telemetry-live-dot"></span>
+      </div>
+
+      <div className="gauges-row">
+        <RadialGauge
+          value={telemetry.cpu}
+          unit="%"
+          label="CPU"
+          color="var(--cyan)"
+          sparkline={telemetry.sparklines?.cpu}
+        />
+        <RadialGauge
+          value={telemetry.ram}
+          unit="%"
+          label="RAM"
+          color={telemetry.ram > 80 ? 'var(--amber)' : 'var(--cyan)'}
+          sparkline={telemetry.sparklines?.ram}
+        />
+        <RadialGauge
+          value={telemetry.latency}
+          unit="ms"
+          max={60}
+          label="LATENCY"
+          color="var(--cyan)"
+          sparkline={telemetry.sparklines?.latency}
+        />
       </div>
     </div>
   );

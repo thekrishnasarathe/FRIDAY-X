@@ -1,43 +1,199 @@
-import { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Mic, MicOff, Volume2, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
+import './VoiceOrb.css';
 
-export default function VoiceOrb() {
-  const [active, setActive] = useState(false);
-  const [status, setStatus] = useState('Tap to speak');
+export default function VoiceOrb({ onTranscript, mode = 'assistant' }) {
+  // states: 'idle' | 'listening' | 'thinking' | 'speaking'
+  const [orbState, setOrbState] = useState('idle');
+  const [statusText, setStatusText] = useState('VOICE PROTOCOL READY');
+  const [micVolume, setMicVolume] = useState(0);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const mediaStreamRef = useRef(null);
+  const animFrameRef = useRef(null);
 
-  const handleClick = async () => {
-    if (active) return;
-    setActive(true);
-    setStatus('Listening...');
+  // Clean up audio context on unmount
+  useEffect(() => {
+    return () => {
+      stopAudioMonitoring();
+    };
+  }, []);
+
+  const startAudioMonitoring = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaStreamRef.current = stream;
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const audioCtx = new AudioCtx();
+      audioContextRef.current = audioCtx;
+
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 64;
+      analyserRef.current = analyser;
+
+      const source = audioCtx.createMediaStreamSource(stream);
+      source.connect(analyser);
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const updateVolume = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / dataArray.length;
+        setMicVolume(Math.min(100, Math.round((avg / 128) * 100)));
+        animFrameRef.current = requestAnimationFrame(updateVolume);
+      };
+      updateVolume();
+    } catch {
+      setMicVolume(35); // fallback animated simulation
+    }
+  };
+
+  const stopAudioMonitoring = () => {
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    if (mediaStreamRef.current) {
+      mediaStreamRef.current.getTracks().forEach(t => t.stop());
+      mediaStreamRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+    setMicVolume(0);
+  };
+
+  const handleOrbClick = async () => {
+    if (orbState === 'listening' || orbState === 'thinking') return;
+
+    setOrbState('listening');
+    setStatusText('LISTENING TO COMMAND...');
+    startAudioMonitoring();
+
+    // Use browser SpeechRecognition if available for instantaneous local capture
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      const recognition = new SpeechRec();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      recognition.onresult = async (event) => {
+        stopAudioMonitoring();
+        const spoken = event.results[0][0].transcript;
+        setOrbState('thinking');
+        setStatusText(`PROCESSING: "${spoken}"`);
+
+        if (onTranscript) {
+          onTranscript(spoken);
+        }
+
+        setTimeout(() => {
+          setOrbState('idle');
+          setStatusText('VOICE PROTOCOL READY');
+        }, 3000);
+      };
+
+      recognition.onerror = async () => {
+        stopAudioMonitoring();
+        fallbackBackendListen();
+      };
+
+      try {
+        recognition.start();
+      } catch {
+        fallbackBackendListen();
+      }
+    } else {
+      fallbackBackendListen();
+    }
+  };
+
+  const fallbackBackendListen = async () => {
+    setOrbState('thinking');
+    setStatusText('ROUTING TO NEURAL SERVER...');
     try {
       const res = await api.voiceListen();
-      setStatus(res?.text || res?.friday_response || 'Done');
-      setTimeout(() => setStatus('Tap to speak'), 4000);
+      stopAudioMonitoring();
+      if (res?.command && onTranscript) {
+        onTranscript(res.command);
+        setOrbState('speaking');
+        setStatusText(`EXECUTED: "${res.command}"`);
+      } else {
+        setStatusText(res?.response || 'NO AUDIO DETECTED');
+      }
     } catch {
-      setStatus('Mic error');
-      setTimeout(() => setStatus('Tap to speak'), 3000);
+      stopAudioMonitoring();
+      setStatusText('MIC HARDWARE UNAVAILABLE');
     }
-    setActive(false);
+    setTimeout(() => {
+      setOrbState('idle');
+      setStatusText('VOICE PROTOCOL READY');
+    }, 3500);
   };
 
   return (
-    <div className="voice-section glass">
-      <span className="hud-label">Audio Protocol</span>
-      <div className={`orb-wrapper ${active ? 'active' : ''}`} onClick={handleClick}>
-        <div className="orb-glow"></div>
-        <div className={`orb ${active ? 'listening' : ''}`}>
-          <div className="orb-ring r1"></div>
-          <div className="orb-ring r2"></div>
-          <svg className="mic-svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-            <line x1="12" x2="12" y1="19" y2="22"/>
-          </svg>
+    <div className="voice-core-card tactical-panel tactical-corner">
+      <div className="voice-core-header">
+        <span className="hud-title">VOICE CORE</span>
+        <span className={`voice-state-pill ${orbState}`}>
+          {orbState.toUpperCase()}
+        </span>
+      </div>
+
+      <div className="reactor-stage">
+        {/* Holographic Arc Reactor */}
+        <div
+          className={`arc-reactor-core ${orbState}`}
+          onClick={handleOrbClick}
+          title="Click to activate Voice Command"
+        >
+          {/* Rotating outer compass ticks */}
+          <div className="reactor-ticks"></div>
+          {/* Conic spinning ring */}
+          <div className="reactor-conic-ring"></div>
+          {/* Inner pulse ring */}
+          <div
+            className="reactor-inner-ring"
+            style={{
+              transform: orbState === 'listening' ? `scale(${1 + micVolume * 0.005})` : undefined,
+              boxShadow: orbState === 'listening' ? `0 0 ${15 + micVolume * 0.3}px var(--cyan)` : undefined,
+            }}
+          ></div>
+
+          {/* Central Holographic Icon */}
+          <div className="reactor-center-node">
+            {orbState === 'idle' && <Mic className="reactor-icon idle" size={24} />}
+            {orbState === 'listening' && <Mic className="reactor-icon listening" size={26} />}
+            {orbState === 'thinking' && <Loader2 className="reactor-icon spinning" size={26} />}
+            {orbState === 'speaking' && <Volume2 className="reactor-icon speaking" size={26} />}
+          </div>
+        </div>
+
+        {/* Ambient audio visualizer bars */}
+        <div className="audio-cadence-bars">
+          {[18, 42, 65, 95, 75, 45, 20].map((h, i) => (
+            <span
+              key={i}
+              className={`cadence-bar ${orbState}`}
+              style={{
+                height: orbState === 'listening'
+                  ? `${Math.max(4, Math.round(h * (micVolume / 100)))}px`
+                  : orbState === 'thinking' || orbState === 'speaking'
+                  ? `${Math.max(6, (h % 30) + 8)}px`
+                  : '4px',
+              }}
+            />
+          ))}
         </div>
       </div>
-      <p className="voice-status glow">{status}</p>
-      {active && <div className="wave-bars">{[1,2,3,4,5].map(i=><span key={i}/>)}</div>}
+
+      <div className="voice-status-bar">
+        <div className="status-signal-dot"></div>
+        <span className="voice-status-text">{statusText}</span>
+      </div>
     </div>
   );
 }

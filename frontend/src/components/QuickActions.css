@@ -1,73 +1,112 @@
-.quick-actions-container {
-  padding: 20px;
+/* ═══════════════════════════════════════════════════════
+   QUICK ACTIONS — Unclipped 3x3 Tactical Grid
+   ═══════════════════════════════════════════════════════ */
+
+.quick-actions-card {
+  padding: 14px 14px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 12px;
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.actions-grid {
+.qa-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.qa-count-badge {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+}
+
+.qa-tactical-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.action-tile {
-  background: var(--bg-input);
-  padding: 20px 10px;
+.qa-tile-btn {
+  background: rgba(8, 18, 36, 0.75);
+  border: 1px solid rgba(0, 240, 255, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 10px 4px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 6px;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
   overflow: hidden;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.action-tile::before {
+.qa-tile-btn::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(0, 210, 255, 0) 0%, rgba(0, 210, 255, 0.1) 100%);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cyan), transparent);
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
 }
 
-.action-tile:hover {
-  background: rgba(0, 210, 255, 0.05);
+.qa-tile-btn:hover {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: var(--cyan);
+  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px var(--primary-dim);
 }
 
-.action-tile:hover::before {
+.qa-tile-btn:hover::before {
   opacity: 1;
 }
 
-.action-tile:active {
-  transform: translateY(1px);
+.qa-tile-btn:active {
+  transform: translateY(0);
 }
 
-.action-icon {
-  font-size: 1.5rem;
-  color: var(--text-main);
-  transition: color 0.3s;
+.qa-tile-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cyan);
+  transition: all 0.2s;
 }
 
-.action-tile:hover .action-icon {
-  color: var(--primary-glow);
-  filter: drop-shadow(0 0 5px var(--primary-glow));
+.qa-tile-btn:hover .qa-tile-icon-box {
+  color: #FFFFFF;
+  filter: drop-shadow(0 0 6px var(--cyan));
 }
 
-.action-label {
+.qa-tile-label {
   font-family: var(--font-hud);
-  font-size: 0.75rem;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  padding: 0 2px;
+}
+
+.qa-tile-btn:hover .qa-tile-label {
+  color: var(--text-primary);
 }

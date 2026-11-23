@@ -39,7 +39,7 @@ def process_command(command: str) -> str:
 
         # ─── GREETING ────────────────────────────────────
         if intent == "greeting":
-            response = chat_with_ai(command, _conversation_history)
+            response = chat_with_ai(command, _conversation_history, mode=get_mode())
             _log_and_save(original, response)
             return response
 
@@ -53,7 +53,7 @@ def process_command(command: str) -> str:
                 return response
 
         # ─── CONVERSATIONAL AI FALLBACK ──────────────────
-        response = chat_with_ai(command, _conversation_history)
+        response = chat_with_ai(command, _conversation_history, mode=get_mode())
         _log_and_save(original, response)
         return response
 

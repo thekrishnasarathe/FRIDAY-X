@@ -1,0 +1,241 @@
+/* ═══════════════════════════════════════════════════════
+   VOICE CORE — Holographic Arc Reactor
+   ═══════════════════════════════════════════════════════ */
+
+.voice-core-card {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.voice-core-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.voice-state-pill {
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  letter-spacing: 1.5px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  background: rgba(0, 240, 255, 0.05);
+  color: var(--text-secondary);
+  transition: all 0.3s ease;
+}
+
+.voice-state-pill.listening {
+  color: var(--cyan);
+  border-color: var(--cyan);
+  background: var(--cyan-dim);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+}
+
+.voice-state-pill.thinking {
+  color: var(--amber);
+  border-color: var(--amber);
+  background: var(--amber-dim);
+  box-shadow: 0 0 10px rgba(255, 184, 0, 0.4);
+}
+
+.voice-state-pill.speaking {
+  color: var(--emerald);
+  border-color: var(--emerald);
+  background: var(--emerald-dim);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+}
+
+/* Reactor Stage */
+.reactor-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0 4px;
+}
+
+.arc-reactor-core {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: radial-gradient(circle at center, rgba(0, 240, 255, 0.12) 0%, rgba(4, 12, 28, 0.9) 70%);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 15px rgba(0, 240, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.arc-reactor-core:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 25px rgba(0, 240, 255, 0.4), inset 0 0 20px rgba(0, 240, 255, 0.25);
+  transform: scale(1.02);
+}
+
+/* Outer rotating ticks */
+.reactor-ticks {
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 240, 255, 0.35);
+  animation: rotate-slow 24s linear infinite;
+  pointer-events: none;
+}
+
+/* Conic spinning ring */
+.reactor-conic-ring {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--cyan);
+  border-right-color: rgba(0, 240, 255, 0.4);
+  animation: rotate-fast 6s linear infinite;
+}
+
+.arc-reactor-core.thinking .reactor-conic-ring {
+  border-top-color: var(--amber);
+  border-right-color: rgba(255, 184, 0, 0.5);
+  animation: rotate-fast 1s linear infinite;
+}
+
+.arc-reactor-core.speaking .reactor-conic-ring {
+  border-top-color: var(--emerald);
+  border-right-color: rgba(0, 255, 157, 0.5);
+  animation: rotate-fast 2.5s linear infinite;
+}
+
+/* Inner pulse ring */
+.reactor-inner-ring {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cyan);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.reactor-center-node {
+  position: relative;
+  z-index: 5;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(4, 12, 28, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 240, 255, 0.4);
+}
+
+.reactor-icon {
+  color: var(--cyan);
+  transition: all 0.2s ease;
+}
+
+.reactor-icon.idle {
+  color: var(--cyan);
+  animation: icon-breathe 2.5s infinite alternate;
+}
+
+.reactor-icon.listening {
+  color: var(--cyan);
+  filter: drop-shadow(0 0 6px var(--cyan));
+}
+
+.reactor-icon.spinning {
+  color: var(--amber);
+  animation: rotate-fast 1.2s linear infinite;
+}
+
+.reactor-icon.speaking {
+  color: var(--emerald);
+  animation: pulse-quick 0.8s infinite alternate;
+}
+
+/* Visualizer Bars below orb */
+.audio-cadence-bars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 20px;
+}
+
+.cadence-bar {
+  width: 3px;
+  background: var(--cyan);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+  transition: height 0.1s ease, background-color 0.2s ease;
+}
+
+.cadence-bar.thinking {
+  background: var(--amber);
+  box-shadow: 0 0 6px rgba(255, 184, 0, 0.4);
+}
+
+.cadence-bar.speaking {
+  background: var(--emerald);
+  box-shadow: 0 0 6px rgba(0, 255, 157, 0.4);
+}
+
+/* Status Bar */
+.voice-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(0, 240, 255, 0.03);
+  border: 1px solid rgba(0, 240, 255, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+.status-signal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan);
+  flex-shrink: 0;
+}
+
+.voice-status-text {
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Animations */
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-fast {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes icon-breathe {
+  0% { opacity: 0.6; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+@keyframes pulse-quick {
+  0% { transform: scale(0.92); }
+  100% { transform: scale(1.08); }
+}

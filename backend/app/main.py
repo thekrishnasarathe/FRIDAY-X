@@ -1,4 +1,5 @@
 import os
+import time
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes.voice_routes import router as voice_router
@@ -11,11 +12,14 @@ from app.routes.study_routes import router as study_router
 from app.routes.security_routes import router as security_router
 from app.routes.vision_routes import router as vision_router
 from app.routes.file_routes import router as file_router
-from app.config import APP_NAME, VERSION, OWNER_NAME, ASSISTANT_NAME, FRONTEND_URL
+from app.config import APP_NAME, VERSION, OWNER_NAME, ASSISTANT_NAME, FRONTEND_URL, GROQ_API_KEY, GEMINI_API_KEY
+from app.modules.memory.session_memory import get_command_history
+
+SERVER_START_TIME = time.time()
 
 app = FastAPI(
     title=APP_NAME,
-    description=f"{ASSISTANT_NAME} — AI Powered Personal Desktop Assistant",
+    description=f"{ASSISTANT_NAME} — AI Powered Personal Tactical Desktop Assistant",
     version=VERSION,
 )
 
@@ -54,8 +58,11 @@ else:
 # ─── Register all routes ────────────────────────────────────
 app.include_router(voice_router, prefix="/voice", tags=["Voice"])
 app.include_router(chat_router, prefix="/chat", tags=["Chat"])
+app.include_router(chat_router, prefix="/api/chat", tags=["Chat API"])
 app.include_router(automation_router, prefix="/automation", tags=["Automation"])
+app.include_router(automation_router, prefix="/api/automation", tags=["Automation API"])
 app.include_router(memory_router, prefix="/memory", tags=["Memory"])
+app.include_router(memory_router, prefix="/api/memory", tags=["Memory API"])
 app.include_router(communication_router, prefix="/communication", tags=["Communication"])
 app.include_router(coding_router, prefix="/coding", tags=["Coding"])
 app.include_router(study_router, prefix="/study", tags=["Study"])
@@ -74,8 +81,10 @@ def root():
         "status": "online",
         "endpoints": {
             "chat": "/chat/",
+            "chat_stream": "/chat/stream",
             "voice": "/voice/listen",
             "automation": "/automation/execute",
+            "telemetry": "/automation/telemetry",
             "memory": "/memory/history",
             "communication": "/communication/",
             "coding": "/coding/",
@@ -90,9 +99,18 @@ def root():
 
 @app.get("/health", tags=["System"])
 def health_check():
+    provider = "groq" if GROQ_API_KEY else ("gemini" if GEMINI_API_KEY else "offline")
     return {
         "status": "healthy",
         "health": "ok",
         "service": APP_NAME,
-        "version": VERSION
+        "version": VERSION,
+        "llm_provider": provider,
+        "llm_configured": bool(GROQ_API_KEY or GEMINI_API_KEY),
+        "available_modules": [
+            "voice_core", "react_agent", "stream_engine", "telemetry",
+            "memory_vault", "coding_studio", "study_suite", "security_shield"
+        ],
+        "memory_entries": len(get_command_history(500)),
+        "uptime_seconds": round(time.time() - SERVER_START_TIME, 1)
     }

@@ -1,0 +1,133 @@
+/* ═══════════════════════════════════════════════════════
+   MEMORY & SECURITY CARD
+   ═══════════════════════════════════════════════════════ */
+
+.memory-sec-card {
+  padding: 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.memsec-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signal-level-bars {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.signal-level-bars .bar {
+  width: 4px;
+  height: 10px;
+  background: rgba(0, 255, 157, 0.2);
+  border-radius: 1px;
+}
+
+.signal-level-bars .bar.active {
+  background: var(--emerald);
+  box-shadow: 0 0 6px var(--emerald);
+}
+
+.memsec-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memsec-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(0, 240, 255, 0.02);
+  border: 1px solid rgba(0, 240, 255, 0.08);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+}
+
+.memsec-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+}
+
+.indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.indicator-dot.emerald, .row-icon.emerald {
+  color: var(--emerald);
+  background-color: var(--emerald);
+  box-shadow: 0 0 6px var(--emerald);
+}
+
+.row-icon.emerald {
+  background: transparent;
+  box-shadow: none;
+}
+
+.badge-pill {
+  font-family: var(--font-hud);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 2px 7px;
+  border-radius: 3px;
+}
+
+.badge-pill.emerald {
+  color: var(--emerald);
+  background: rgba(0, 255, 157, 0.1);
+  border: 1px solid rgba(0, 255, 157, 0.3);
+}
+
+/* Action Footer */
+.memsec-footer {
+  display: flex;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.memsec-action-btn {
+  flex: 1;
+  padding: 6px 8px;
+  background: rgba(0, 240, 255, 0.04);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--cyan);
+  font-family: var(--font-hud);
+  font-size: 0.62rem;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+
+.memsec-action-btn:hover {
+  background: var(--cyan-dim);
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.25);
+}
+
+.memsec-action-btn.lock-btn {
+  color: var(--emerald);
+  border-color: rgba(0, 255, 157, 0.3);
+}
+
+.memsec-action-btn.lock-btn:hover {
+  background: var(--emerald-dim);
+  border-color: var(--emerald);
+  box-shadow: 0 0 10px rgba(0, 255, 157, 0.25);
+}
