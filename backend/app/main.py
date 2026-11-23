@@ -27,6 +27,7 @@ default_origins = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "https://friday-x-nine.vercel.app",
 ]
 
 env_origins = [orig.strip() for orig in FRONTEND_URL.split(",") if orig.strip()]
@@ -44,6 +45,7 @@ else:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
+        allow_origin_regex=r"^https:\/\/.*\.vercel\.app$",
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

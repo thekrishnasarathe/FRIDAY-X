@@ -14,9 +14,9 @@
 
 | Service | Status | Live Link |
 | :--- | :---: | :--- |
-| **Frontend Dashboard (Vercel)** | 🟢 Deployed | `https://your-friday-x-frontend.vercel.app` *(Replace with your Vercel URL)* |
-| **Backend API (Render)** | 🟢 Deployed | `https://your-friday-x-backend.onrender.com` *(Replace with your Render URL)* |
-| **Swagger API Docs** | 🟢 Live | `https://your-friday-x-backend.onrender.com/docs` |
+| **Frontend Dashboard (Vercel)** | 🟢 Live | [https://friday-x-nine.vercel.app](https://friday-x-nine.vercel.app) |
+| **Backend API (Render)** | 🟢 Live | [https://friday-x-backend.onrender.com](https://friday-x-backend.onrender.com) |
+| **Swagger API Docs** | 🟢 Live | [https://friday-x-backend.onrender.com/docs](https://friday-x-backend.onrender.com/docs) |
 
 ---
 
