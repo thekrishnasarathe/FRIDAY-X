@@ -71,3 +71,16 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--primary-dim); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ─── Energy Saver Mode ───────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-play-state: paused !important;
+    transition: none !important;
+  }
+}
+
+body.eco-mode *, body.eco-mode *::before, body.eco-mode *::after {
+  animation-play-state: paused !important;
+  transition: none !important;
+}

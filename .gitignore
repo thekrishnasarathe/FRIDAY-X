@@ -1,14 +1,66 @@
+# Environments and Secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Python artifacts
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
 venv/
 .venv/
 backend/venv/
 backend/.venv/
-*.egg-info/
-.env
+env/
+ENV/
+
+# Data and logs
 *.log
 backend/app/data/*.json
 backend/app/data/*.log
+!backend/app/data/.gitkeep
+
+# Databases and cache
+*.db
+*.sqlite*
+.cache/
+cache/
+exports/
+.pytest_cache/
+
+# Node / Frontend
+node_modules/
 frontend/node_modules/
 frontend/dist/
+frontend/build/
+.npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System & IDEs
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo

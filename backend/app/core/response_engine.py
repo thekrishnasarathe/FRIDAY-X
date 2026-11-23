@@ -1,5 +1,5 @@
 from datetime import datetime
-from app.config import SYSTEM_PROMPT, GEMINI_API_KEY, OWNER_NAME, ASSISTANT_NAME
+from app.config import SYSTEM_PROMPT, OWNER_NAME, ASSISTANT_NAME
 from app.utils.logger import log_error
 
 
@@ -23,47 +23,47 @@ def generate_response(action_result: str, mode: str = "assistant") -> str:
 
 def chat_with_ai(user_message: str, conversation_history: list = None) -> str:
     """
-    Send a message to Google Gemini for natural, Jarvis-style conversation.
+    Send a message to Groq for natural, Jarvis-style conversation.
     Supports English, Hindi, and Hinglish automatically.
     Falls back to a personality-driven offline response if no API key.
     Includes retry logic for rate limits.
     """
-    if not GEMINI_API_KEY:
+    from app.config import GROQ_API_KEY
+    if not GROQ_API_KEY:
         return _offline_response(user_message)
 
     import time
 
     try:
-        import google.generativeai as genai
+        from groq import Groq
 
-        genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel("gemini-2.0-flash")
+        client = Groq(api_key=GROQ_API_KEY, timeout=10.0)
 
         # Build conversation context
-        messages = [SYSTEM_PROMPT + "\n\n"]
+        messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
         if conversation_history:
             for entry in conversation_history[-10:]:
                 role = entry.get("role", "user")
                 text = entry.get("text", "")
                 if role == "user":
-                    messages.append(f"User: {text}")
+                    messages.append({"role": "user", "content": text})
                 else:
-                    messages.append(f"FRIDAY: {text}")
+                    messages.append({"role": "assistant", "content": text})
 
-        messages.append(f"User: {user_message}")
-        messages.append("FRIDAY:")
-
-        prompt = "\n".join(messages)
+        messages.append({"role": "user", "content": user_message})
 
         # Retry with backoff for rate limits
         max_retries = 3
         for attempt in range(max_retries):
             try:
-                response = model.generate_content(prompt)
+                response = client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=messages,
+                )
 
-                if response and response.text:
-                    return response.text.strip()
+                if response and response.choices and response.choices[0].message.content:
+                    return response.choices[0].message.content.strip()
 
                 return _offline_response(user_message)
 
@@ -147,12 +147,12 @@ def _offline_response(message: str) -> str:
     # ─── FALLBACK ─────────────────────────────────────────
     if lang != "english":
         return (
-            f"Samajh gaya Boss. Lekin agar Gemini API key lagao toh "
+            f"Samajh gaya Boss. Lekin agar Groq API key lagao toh "
             f"main full power pe kaam karunga. Abhi offline mode mein hoon."
         )
     return (
         f"I hear you, Boss. I'd give a smarter answer with "
-        f"my AI brain connected. Add your Gemini API key to unlock full mode."
+        f"my AI brain connected. Add your Groq API key to unlock full mode."
     )
 
 

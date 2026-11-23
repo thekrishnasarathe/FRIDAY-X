@@ -21,6 +21,10 @@ def route_command(command: str, intent: str = None):
     command = command.lower().strip()
     normalized = normalize_command(command)
 
+    if not intent:
+        from app.core.intent_classifier import classify_intent
+        intent = classify_intent(command)
+
     # ─── TIME / DATE ──────────────────────────────────────
     if intent == "time_date":
         return get_datetime_info(command)

@@ -10,6 +10,7 @@ class ChatRequest(BaseModel):
     message: str
     speak: bool = False  # optionally speak the response aloud
 
+@router.post("")
 @router.post("/")
 def chat_with_friday(request: ChatRequest):
     response = process_command(request.message)

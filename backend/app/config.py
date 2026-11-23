@@ -7,11 +7,16 @@ load_dotenv()
 APP_NAME = "FRIDAY-X"
 VERSION = "3.0.0"
 ASSISTANT_NAME = "FRIDAY"
-OWNER_NAME = os.getenv("OWNER_NAME", "Krishna")
+OWNER_NAME = os.getenv("OWNER_NAME", "Boss")
 DEFAULT_MODE = "assistant"
 
-# ─── Gemini AI ───────────────────────────────────────────
+# ─── AI Providers ────────────────────────────────────────
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+# ─── Server & Networking ─────────────────────────────────
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+PORT = int(os.getenv("PORT", "8000"))
 
 # ─── Email ───────────────────────────────────────────────
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS", "")
@@ -20,6 +25,7 @@ EMAIL_APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD", "")
 # ─── Paths ───────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
+os.makedirs(DATA_DIR, exist_ok=True)
 MEMORY_FILE = os.path.join(DATA_DIR, "memory.json")
 USER_PREFS_FILE = os.path.join(DATA_DIR, "user_profiles.json")
 SETTINGS_FILE = os.path.join(DATA_DIR, "settings.json")

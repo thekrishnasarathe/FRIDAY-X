@@ -14,7 +14,24 @@ export default function SystemStatus() {
     } catch {}
   };
 
-  useEffect(() => { fetch_(); const i = setInterval(fetch_, 12000); return () => clearInterval(i); }, []);
+  useEffect(() => {
+    fetch_();
+    let i = setInterval(() => { if (!document.hidden) fetch_(); }, 60000);
+    
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        fetch_();
+        clearInterval(i);
+        i = setInterval(() => { if (!document.hidden) fetch_(); }, 60000);
+      }
+    };
+    
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      clearInterval(i);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
 
   const Ring = ({ pct, color, label, icon }) => {
     const r = 32, c = 2 * Math.PI * r, off = c - (pct / 100) * c;
